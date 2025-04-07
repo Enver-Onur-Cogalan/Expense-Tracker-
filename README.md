@@ -64,24 +64,6 @@
 
 ---
 
-# 📱 Screenshots
--HomeScreen-
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_8beiag/Ekran Resmi 2025-04-07 21.27.33.png
--AddExpenseScreen-
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_Xz7ZYp/Ekran Resmi 2025-04-07 21.26.06.png
--CategoryScreen-
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_hmXpWS/Ekran Resmi 2025-04-07 21.26.22.png
--ExpenseDetailScreen-
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_Napg4X/Ekran Resmi 2025-04-07 21.27.47.png
--StatisticsScreen-
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_WE1qxn/Ekran Resmi 2025-04-07 21.28.04.png
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_5qw7VA/Ekran Resmi 2025-04-07 21.29.35.png
-/var/folders/68/gy66601j18z7358swsfqx54h0000gn/T/TemporaryItems/NSIRD_screencaptureui_Kdcj3I/Ekran Resmi 2025-04-07 21.29.45.png
--
-
-
----
-
 # 📋 Evaluation Criteria
 
 - Functionality: All main features are working.
