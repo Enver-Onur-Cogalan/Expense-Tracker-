@@ -1,4 +1,4 @@
-import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import spacing from '../theme/spacing'
 import colors from '../theme/colors'
@@ -88,6 +88,13 @@ const HomeScreen = ({ navigation, route }) => {
             </View>
 
             <View style={styles.listContainer}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('Statistics')}
+                    style={styles.chartButton}
+                >
+                    <Text style={styles.chartButtonText}>{i18n.t('statistics')}</Text>
+                </TouchableOpacity>
+
                 {filteredExpenses.length === 0 ? (
                     <Text style={{ textAlign: 'center', marginTop: 20, color: colors.text }}>
                         {i18n.t('noExpenses')}
@@ -210,5 +217,16 @@ const styles = StyleSheet.create({
     },
     listContainer: {
         flex: 1,
+    },
+    chartButton: {
+        backgroundColor: colors.primary,
+        padding: 10,
+        margin: 10,
+        borderRadius: spacing.small,
+        alignItems: 'center',
+    },
+    chartButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
     },
 });

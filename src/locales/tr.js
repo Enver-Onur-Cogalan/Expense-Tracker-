@@ -26,4 +26,9 @@ export default {
     back: "Geri Dön",
     expenseDetail: "Gider Detayı",
     selectCategory: "Kategori Seçiniz",
+    deleteCategory: "Kategoriyi Sil",
+    confirmDeleteCategory: "Bu kategoriyi silmek istediğine emin misin?",
+    monthlyStatistics: "Aylık Harcama",
+    noData: "Data yok",
+    statistics: "İstatistikler",
 };

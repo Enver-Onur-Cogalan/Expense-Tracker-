@@ -9,8 +9,8 @@ const i18n = new I18n({
 })
 
 
-i18n.defaultLocale = 'tr';
-i18n.locale = 'tr';
+i18n.defaultLocale = 'en';
+i18n.locale = 'en';
 i18n.enableFallback = true;
 
 export default i18n;

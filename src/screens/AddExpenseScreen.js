@@ -1,16 +1,20 @@
-import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
-import React, { useState, useEffect } from 'react'
-import spacing from '../theme/spacing'
-import colors from '../theme/colors'
-import fonts from '../theme/fonts'
-import i18n from '../locales/i18n'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import spacing from '../theme/spacing';
+import colors from '../theme/colors';
+import fonts from '../theme/fonts';
+import i18n from '../locales/i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Platform } from 'react-native';
 
 const AddExpenseScreen = ({ navigation, route }) => {
     const [title, setTitle] = useState('')
     const [amount, setAmount] = useState('')
     const [date, setDate] = useState('')
     const [category, setCategory] = useState('')
+
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const handleSave = async () => {
         if (!title || !amount || !date || !category) {
@@ -83,13 +87,30 @@ const AddExpenseScreen = ({ navigation, route }) => {
                     style={styles.input}
                     placeholderTextColor={colors.textLight}
                 />
-                <TextInput
-                    placeholder={i18n.t('enterDate')}
-                    value={date}
-                    onChangeText={setDate}
+                <TouchableOpacity
                     style={styles.input}
-                    placeholderTextColor={colors.textLight}
-                />
+                    onPress={() => setShowDatePicker(true)}
+                >
+                    <Text style={{ color: date ? colors.text : colors.textLight }}>
+                        {date || i18n.t('enterDate')}
+                    </Text>
+                </TouchableOpacity>
+
+                {showDatePicker && (
+                    <DateTimePicker
+                        value={date ? new Date(date) : new Date()}
+                        mode='date'
+                        display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                        onChange={(event, selectedDate) => {
+                            setShowDatePicker(Platform.OS === 'ios');
+                            if (selectedDate) {
+                                const formattedDate = selectedDate.toISOString().split('T')[0];
+                                setDate(formattedDate);
+                            }
+                        }}
+                    />
+                )}
+
                 <TouchableOpacity
                     style={styles.input}
                     onPress={() => navigation.navigate('Category', {
