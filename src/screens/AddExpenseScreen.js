@@ -7,6 +7,7 @@ import i18n from '../locales/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform } from 'react-native';
+import GoBackButton from '../components/GoBackButton';
 
 const AddExpenseScreen = ({ navigation, route }) => {
     const [title, setTitle] = useState('')
@@ -63,9 +64,7 @@ const AddExpenseScreen = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                <Text style={styles.backButtonText}>⏎ {i18n.t('back')}</Text>
-            </TouchableOpacity>
+            <GoBackButton />
 
             <View style={styles.headerContainer}>
                 <Text style={styles.title}>{i18n.t('addExpense')}</Text>
@@ -179,17 +178,6 @@ const styles = StyleSheet.create({
     saveButtonText: {
         color: '#fff',
         fontSize: fonts.medium,
-        fontWeight: 'bold',
-    },
-    backButton: {
-        backgroundColor: colors.primary,
-        padding: spacing.small,
-        borderRadius: 10,
-        alignSelf: 'flex-start',
-    },
-    backButtonText: {
-        color: '#fff',
-        fontSize: fonts.small,
         fontWeight: 'bold',
     },
 })

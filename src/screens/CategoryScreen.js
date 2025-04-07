@@ -6,6 +6,7 @@ import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import CategoryItem from '../components/CategoryItem';
 
 const CategoryScreen = ({ navigation, route }) => {
     const [categories, setCategories] = useState([]);
@@ -174,24 +175,11 @@ const CategoryScreen = ({ navigation, route }) => {
                 data={categories}
                 keyExtractor={(item, index) => `${item}-${index}`}
                 renderItem={({ item }) => (
-                    <View style={[
-                        styles.catergoryItemContainer,
-                        { backgroundColor: colors[item] || colors.primary }
-                    ]}>
-                        <TouchableOpacity
-                            onPress={() => handleCategorySelect(item)}
-                            style={styles.categoryItem}
-                        >
-                            <Text style={styles.categoryText}>{item}</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            onPress={() => deleteCategory(item)}
-                            style={styles.deleteButton}
-                        >
-                            <Text style={styles.deleteButtonText}>🗑️</Text>
-                        </TouchableOpacity>
-                    </View>
+                    <CategoryItem
+                        item={item}
+                        onSelect={handleCategorySelect}
+                        onDelete={deleteCategory}
+                    />
                 )}
             />
 
@@ -203,11 +191,15 @@ const CategoryScreen = ({ navigation, route }) => {
                 placeholderTextColor={colors.text}
             />
             <View style={styles.buttonContainer}>
-                <Button title={i18n.t('addExpense')} onPress={addCategory} />
+                <TouchableOpacity onPress={addCategory} style={styles.addCategoryButton}>
+                    <Text style={styles.buttonText}>{i18n.t('save')}</Text>
+                </TouchableOpacity>
             </View>
 
             <View style={styles.buttonContainer}>
-                <Button title={i18n.t('backHome')} onPress={() => navigation.navigate('Home')} />
+                <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.addCategoryButton}>
+                    <Text style={styles.buttonText}>{i18n.t('backHome')}</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );
@@ -271,10 +263,17 @@ const styles = StyleSheet.create({
         padding: spacing.medium,
         marginBottom: spacing.small,
     },
-    deleteButton: {
-        marginLeft: spacing.small,
+    addCategoryButton: {
+        backgroundColor: colors.primary,
+        padding: spacing.medium,
+        borderRadius: spacing.small,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: spacing.small,
     },
-    deleteButtonText: {
-        fontSize: fonts.large,
+    buttonText: {
+        color: colors.background,
+        fontSize: fonts.medium,
+        fontWeight: 'bold',
     },
 });

@@ -7,6 +7,7 @@ const colors = {
     text: '#333333', // Koyu gri
     error: '#D32F2F', // Kırmızı 
     textLight: '#888',
+    cardText: '#1e90ff',
     'Gıda': '#4CAF50',            // Yeşil
     'Ulaşım': '#2196F3',          // Mavi
     'Eğlence': '#9C27B0',         // Mor

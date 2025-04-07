@@ -4,6 +4,7 @@ import spacing from '../theme/spacing'
 import colors from '../theme/colors'
 import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
+import GoBackButton from '../components/GoBackButton';
 
 
 const ExpenseDetailScreen = ({ route, navigation }) => {
@@ -28,9 +29,7 @@ const ExpenseDetailScreen = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-        <Text style={styles.backButtonText}>⏎ {i18n.t('back')}</Text>
-      </TouchableOpacity>
+      <GoBackButton />
 
       <View style={styles.headerContainer}>
         <Text style={styles.headerTitle}>{i18n.t('expenseDetail')}</Text>
@@ -86,17 +85,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: fonts.medium,
-  },
-  backButton: {
-    backgroundColor: colors.primary,
-    padding: spacing.small,
-    borderRadius: 10,
-    alignSelf: 'flex-start',
-  },
-  backButtonText: {
-    color: '#fff',
-    fontSize: fonts.small,
-    fontWeight: 'bold',
   },
   detailContainer: {
     flex: 1,

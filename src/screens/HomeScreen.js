@@ -1,4 +1,4 @@
-import { Button, FlatList, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import spacing from '../theme/spacing'
 import colors from '../theme/colors'
@@ -7,6 +7,7 @@ import { useCallback } from 'react'
 import fonts from '../theme/fonts'
 import i18n from '../locales/i18n'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import ExpenseItem from '../components/ExpenseItem'
 
 const HomeScreen = ({ navigation, route }) => {
     const [language, setLanguage] = useState(i18n.locale)
@@ -81,6 +82,10 @@ const HomeScreen = ({ navigation, route }) => {
         ? expenses.filter(exp => exp.category === filteredCategory)
         : expenses;
 
+    const handleExpenseSelect = (expense) => {
+        navigation.navigate('ExpenseDetail', { expense });
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.headerContainer}>
@@ -104,23 +109,25 @@ const HomeScreen = ({ navigation, route }) => {
                         data={filteredExpenses}
                         keyExtractor={(item) => item.id}
                         renderItem={({ item }) => (
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('ExpenseDetail', { expense: item })}
-                            >
-                                <View style={styles.expenseItem}>
-                                    <Text style={styles.expenseTitle}>{item.title}</Text>
-                                    <Text style={styles.expenseAmount}>₺{item.amount}</Text>
-                                    <Text style={styles.expenseDate}>{item.date}</Text>
-                                    <Text style={styles.expenseCategory}>{item.category}</Text>
-                                </View>
-                            </TouchableOpacity>
+                            <ExpenseItem
+                                title={item.title}
+                                amount={item.amount}
+                                date={item.date}
+                                category={item.category}
+                                onPress={() => handleExpenseSelect(item)}
+                            />
                         )}
                     />
                 )}
             </View>
 
-            <Button title={i18n.t('addExpense')} onPress={() => navigation.navigate('AddExpense')} />
-
+            <TouchableOpacity
+            onPress={() => navigation.navigate('AddExpense')}
+            style={styles.addExpenseButton}
+            >
+                <Text style={styles.addExpenseButtonText}>{i18n.t('addExpense')}</Text>
+            </TouchableOpacity>
+            
             <View style={styles.languageContainer}>
                 <TouchableOpacity style={styles.languageButton} onPress={() => changeLanguage('tr')}>
                     <Text style={styles.languageButtonText}>{i18n.t('turkish')}</Text>
@@ -227,6 +234,19 @@ const styles = StyleSheet.create({
     },
     chartButtonText: {
         color: 'white',
+        fontWeight: 'bold',
+    },
+    addExpenseButton: {
+        backgroundColor: colors.primary,
+        padding: spacing.medium,
+        borderRadius: spacing.small,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginVertical: spacing.medium,
+    },
+    addExpenseButtonText: {
+        color: colors.background,
+        fontSize: fonts.large,
         fontWeight: 'bold',
     },
 });

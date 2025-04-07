@@ -31,4 +31,9 @@ export default {
     monthlyStatistics: "Aylık Harcama",
     noData: "Data yok",
     statistics: "İstatistikler",
+    months: [
+        'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+        'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+    ],
+    totalExpense: "Toplam Harcama",
 };
