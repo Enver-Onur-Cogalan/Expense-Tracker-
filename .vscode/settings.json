@@ -6,7 +6,7 @@
   "editor.insertSpaces": true,
   "editor.codeActionsOnSave": {
     "source.addMissingImports.ts": "never",
-    "source.fixAll.eslint": "never",
+    "source.fixAll.eslint": "always",
     "source.organizeImports": "never",
     "source.sortImports": "never",
     "source.removeUnused.ts": "never",
