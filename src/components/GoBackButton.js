@@ -4,11 +4,13 @@ import { useNavigation } from '@react-navigation/native';
 import colors from '../theme/colors';
 import spacing from '../theme/spacing';
 import i18n from '../locales/i18n';
+import * as Animatable from 'react-native-animatable';
 
 const GoBackButton = () => {
     const navigation = useNavigation();
 
     return (
+        <Animatable.View animation='bounceIn' duration={1500}>
         <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={{
@@ -23,6 +25,7 @@ const GoBackButton = () => {
                 ⏎ {i18n.t('back')}
             </Text>
         </TouchableOpacity>
+        </Animatable.View>
     );
 };
 

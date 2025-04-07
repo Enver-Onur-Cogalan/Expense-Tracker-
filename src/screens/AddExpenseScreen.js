@@ -8,6 +8,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform } from 'react-native';
 import GoBackButton from '../components/GoBackButton';
+import * as Animatable from 'react-native-animatable';
 
 const AddExpenseScreen = ({ navigation, route }) => {
     const [title, setTitle] = useState('')
@@ -70,7 +71,11 @@ const AddExpenseScreen = ({ navigation, route }) => {
                 <Text style={styles.title}>{i18n.t('addExpense')}</Text>
             </View>
 
-            <View style={styles.formContainer}>
+            <Animatable.View
+            animation='zoomIn'
+            duration={1000}
+            style={styles.formContainer}
+            >
                 <TextInput
                     placeholder={i18n.t('enterTitle')}
                     value={title}
@@ -123,7 +128,7 @@ const AddExpenseScreen = ({ navigation, route }) => {
                         {category || i18n.t('selectCategory')}
                     </Text>
                 </TouchableOpacity>
-            </View>
+            </Animatable.View>
 
             <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                 <Text style={styles.saveButtonText}>{i18n.t('save')}</Text>

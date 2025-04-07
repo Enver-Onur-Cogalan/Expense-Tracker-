@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import spacing from '../theme/spacing';
 import colors from '../theme/colors';
-import { Button, FlatList, Text, TextInput, TouchableOpacity, View, StyleSheet, SafeAreaView, Alert } from 'react-native';
+import { FlatList, Text, TextInput, TouchableOpacity, View, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import CategoryItem from '../components/CategoryItem';
+import * as Animatable from 'react-native-animatable';
 
 const CategoryScreen = ({ navigation, route }) => {
     const [categories, setCategories] = useState([]);
@@ -171,6 +172,7 @@ const CategoryScreen = ({ navigation, route }) => {
                 )}
             </View>
 
+            <Animatable.View animation='fadeInUp' delay={100} duration={1000}>
             <FlatList
                 data={categories}
                 keyExtractor={(item, index) => `${item}-${index}`}
@@ -182,6 +184,7 @@ const CategoryScreen = ({ navigation, route }) => {
                     />
                 )}
             />
+            </Animatable.View>
 
             <TextInput
                 placeholder={i18n.t('addCategory')}

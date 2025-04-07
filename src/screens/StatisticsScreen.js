@@ -10,6 +10,7 @@ import colors from '../theme/colors';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import formatMonthYear from '../utils/formatDate';
 import GoBackButton from '../components/GoBackButton';
+import * as Animatable from 'react-native-animatable'
 
 
 
@@ -79,6 +80,7 @@ const StatisticsScreen = () => {
                         {formatMonthYear(selectedDate)}
                     </Text>
 
+                    <Animatable.View animation='zoomIn' duration={1000}>
                     {chartData.length > 0 ? (
                         <PieChart
                             data={chartData}
@@ -99,6 +101,7 @@ const StatisticsScreen = () => {
                     ) : (
                         <Text>{i18n.t('noData')}</Text>
                     )}
+                    </Animatable.View>
                 </View>
             </ScrollView>
             <TouchableOpacity

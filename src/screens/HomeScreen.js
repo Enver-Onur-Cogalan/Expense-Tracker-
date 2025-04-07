@@ -8,6 +8,7 @@ import fonts from '../theme/fonts'
 import i18n from '../locales/i18n'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import ExpenseItem from '../components/ExpenseItem'
+import * as Animatable from 'react-native-animatable';
 
 const HomeScreen = ({ navigation, route }) => {
     const [language, setLanguage] = useState(i18n.locale)
@@ -100,6 +101,7 @@ const HomeScreen = ({ navigation, route }) => {
                     <Text style={styles.chartButtonText}>{i18n.t('statistics')}</Text>
                 </TouchableOpacity>
 
+                <Animatable.View animation='fadeIn' duration={2000} delay={100}>
                 {filteredExpenses.length === 0 ? (
                     <Text style={{ textAlign: 'center', marginTop: 20, color: colors.text }}>
                         {i18n.t('noExpenses')}
@@ -119,6 +121,7 @@ const HomeScreen = ({ navigation, route }) => {
                         )}
                     />
                 )}
+                </Animatable.View>
             </View>
 
             <TouchableOpacity
@@ -127,7 +130,7 @@ const HomeScreen = ({ navigation, route }) => {
             >
                 <Text style={styles.addExpenseButtonText}>{i18n.t('addExpense')}</Text>
             </TouchableOpacity>
-            
+
             <View style={styles.languageContainer}>
                 <TouchableOpacity style={styles.languageButton} onPress={() => changeLanguage('tr')}>
                     <Text style={styles.languageButtonText}>{i18n.t('turkish')}</Text>
