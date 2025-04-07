@@ -3,6 +3,7 @@ import colors from '../theme/colors';
 import spacing from '../theme/spacing';
 import fonts from '../theme/fonts';
 
+// Component that displays the category name and performs selection or deletion when clicked
 const CategoryItem = ({ item, onSelect, onDelete }) => {
     return (
         <View style={[styles.container, { backgroundColor: colors[item] || colors.primary }]}>

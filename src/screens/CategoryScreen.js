@@ -1,3 +1,6 @@
+// CategoryScreen.js
+// Screen where the user can list and manage expense categories.
+
 import React, { useCallback, useEffect, useState } from 'react';
 import spacing from '../theme/spacing';
 import colors from '../theme/colors';
@@ -10,12 +13,12 @@ import CategoryItem from '../components/CategoryItem';
 import * as Animatable from 'react-native-animatable';
 
 const CategoryScreen = ({ navigation, route }) => {
-    const [categories, setCategories] = useState([]);
-    const [newCategory, setNewCategory] = useState('');
+    const [categories, setCategories] = useState([]);  // Keeps the category list
+    const [newCategory, setNewCategory] = useState('');  // Holds the name of the newly added category
 
-    const mode = route.params?.mode || 'filter';
+    const mode = route.params?.mode || 'filter';  // Keeps track of which mode the user is in (selection or filtering)
 
-    const [prevLocale, setPrevLocale] = useState(i18n.locale);
+    const [prevLocale, setPrevLocale] = useState(i18n.locale);  // Keeps the previous language, used to control language change
 
     const defaultCategories = {
         tr: ['Gıda', 'Ulaşım', 'Eğlence', 'Kişisel Bakım', 'Sağlık'],
@@ -34,13 +37,15 @@ const CategoryScreen = ({ navigation, route }) => {
                     setCategories(defaults);
                 }
             } catch (error) {
-                console.log('Kategoriler yüklenirken hata oluştu:', error);
+                console.log('An error occurred while loading categories:', error);
             }
         };
 
         loadCategories();
     }, []);
 
+
+    // Refreshes the categories every time the screen is focused.
     useFocusEffect(
         useCallback(() => {
             const fetchCategories = async () => {
@@ -50,7 +55,7 @@ const CategoryScreen = ({ navigation, route }) => {
                         setCategories(JSON.parse(storedCategories));
                     }
                 } catch (error) {
-                    console.log("Focus'ta kategori yüklenirken hata oluştu:", error);
+                    console.log("Error loading category in Focus:", error);
                 }
             };
 
@@ -58,6 +63,7 @@ const CategoryScreen = ({ navigation, route }) => {
         }, [])
     );
 
+    // Updates default categories when language changes.
     useEffect(() => {
         const updatedCategoriesForLanguageChange = async () => {
             try {
@@ -75,18 +81,20 @@ const CategoryScreen = ({ navigation, route }) => {
                 await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
                 setCategories(updatedCategories);
             } catch (error) {
-                console.log('Dil değişiminde kategoriler güncellenirken hata oluştu:', error)
+                console.log('An error occurred while updating categories on language change:', error)
             }
         };
         updatedCategoriesForLanguageChange();
     }, [i18n.locale]);
 
+
+    // When the category list changes, it saves the new list to AsyncStorage.
     useEffect(() => {
         const saveCategories = async () => {
             try {
                 await AsyncStorage.setItem('categories', JSON.stringify(categories));
             } catch (error) {
-                console.log('Kategoriler kaydedilirken hata oluştu:', error);
+                console.log('An error occurred while saving categories:', error);
             }
         };
 
@@ -96,6 +104,7 @@ const CategoryScreen = ({ navigation, route }) => {
     }, [categories]);
 
 
+    // Adds new category and saves it to AsyncStorage.
     const addCategory = async () => {
         if (newCategory.trim() === '') return;
 
@@ -110,12 +119,11 @@ const CategoryScreen = ({ navigation, route }) => {
                 setNewCategory('');
             }
         } catch (error) {
-            console.log('Kategori eklerken hata oluştu:', error);
+            console.log('An error occurred while adding a category:', error);
         }
     };
 
-
-
+    // Deletes the selected category and updates the AsyncStorage.
     const deleteCategory = (categoryToDelete) => {
         Alert.alert(
             i18n.t('deleteCategory'),
@@ -134,7 +142,7 @@ const CategoryScreen = ({ navigation, route }) => {
                             await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
                             setCategories(updatedCategories);
                         } catch (error) {
-                            console.log('Kategori silerken hata oluştu:', error);
+                            console.log('An error occurred while deleting a category:', error);
                         }
                     }
                 }
@@ -143,6 +151,7 @@ const CategoryScreen = ({ navigation, route }) => {
     };
 
 
+    // When a category is selected, it directs to the relevant screen.
     const handleCategorySelect = (category) => {
         if (mode === 'select') {
             navigation.navigate('AddExpense', {
@@ -176,7 +185,8 @@ const CategoryScreen = ({ navigation, route }) => {
             <FlatList
                 data={categories}
                 keyExtractor={(item, index) => `${item}-${index}`}
-                renderItem={({ item }) => (
+                // Render list items for each category (with selection and deletion operations)
+                renderItem={({ item }) => (  
                     <CategoryItem
                         item={item}
                         onSelect={handleCategorySelect}

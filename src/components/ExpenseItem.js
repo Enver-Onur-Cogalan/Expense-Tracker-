@@ -3,6 +3,7 @@ import colors from '../theme/colors';
 import spacing from '../theme/spacing';
 import fonts from '../theme/fonts';
 
+// Component that displays expense information and directs to the detail screen when clicked
 const ExpenseItem = ({ title, amount, date, category, onPress }) => {
     return (
         <TouchableOpacity onPress={onPress} style={styles.container}>

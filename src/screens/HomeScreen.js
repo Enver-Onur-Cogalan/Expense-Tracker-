@@ -1,4 +1,7 @@
-import { Button, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+// HomeScreen.js
+// Home screen: Home page where expenses are listed and new expenses can be added.
+
+import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import spacing from '../theme/spacing'
 import colors from '../theme/colors'
@@ -12,9 +15,10 @@ import * as Animatable from 'react-native-animatable';
 
 const HomeScreen = ({ navigation, route }) => {
     const [language, setLanguage] = useState(i18n.locale)
-    const [expenses, setExpenses] = useState([])
-    const [isFirstLoad, setIsFirstLoad] = useState(true) // sadece ilk yükleme için kontrol
+    const [expenses, setExpenses] = useState([]) // State used to store expense data
+    const [isFirstLoad, setIsFirstLoad] = useState(true) // check only for first load
 
+    // Changes the language of the application according to the language selected by the user
     const changeLanguage = (lang) => {
         i18n.locale = lang
         setLanguage(lang)
@@ -26,7 +30,7 @@ const HomeScreen = ({ navigation, route }) => {
             const parsedExpenses = storedExpenses ? JSON.parse(storedExpenses) : [];
             setExpenses(parsedExpenses);
         } catch (error) {
-            console.log('Veriler yüklenirken hata oluştu:', error);
+            console.log('An error occurred while loading data:', error);
         }
     }
 
@@ -70,7 +74,7 @@ const HomeScreen = ({ navigation, route }) => {
                     }
 
                 } catch (error) {
-                    console.log('Veriler güncellenirken hata oluştu:', error);
+                    console.log('An error occurred while updating data:', error);
                 }
             };
 
@@ -78,11 +82,14 @@ const HomeScreen = ({ navigation, route }) => {
         }, [route.params])
     );
 
+    // If a category filter is selected, it will only show expenses belonging to that category.
+    // Otherwise, all expenses are listed.
     const filteredCategory = route.params?.filterCategory;
     const filteredExpenses = filteredCategory
         ? expenses.filter(exp => exp.category === filteredCategory)
         : expenses;
 
+// Function used to go to the detail page when the expense is selected
     const handleExpenseSelect = (expense) => {
         navigation.navigate('ExpenseDetail', { expense });
     }
@@ -110,7 +117,7 @@ const HomeScreen = ({ navigation, route }) => {
                     <FlatList
                         data={filteredExpenses}
                         keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (
+                        renderItem={({ item }) => (   // Render list item for each expense
                             <ExpenseItem
                                 title={item.title}
                                 amount={item.amount}

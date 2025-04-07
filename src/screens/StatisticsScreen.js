@@ -1,3 +1,6 @@
+// StatisticsScreen.js
+// Statistics screen that displays the user's expenses graphically.
+
 import { Dimensions, SafeAreaView, ScrollView, TouchableOpacity, View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { PieChart } from 'react-native-chart-kit';
@@ -20,11 +23,13 @@ const StatisticsScreen = () => {
     const [showDatePicker, setShowDatePicker] = useState(false)
 
 
+    // Loads expense data according to the selected date and updates the PieChart data
     useEffect(() => {
         loadExpenses();
     }, [selectedDate]);
 
 
+    // Loads expense data from AsyncStorage and filters it by selected month
     const loadExpenses = async () => {
         try {
             const storedExpenses = await AsyncStorage.getItem('expenses');
@@ -51,6 +56,8 @@ const StatisticsScreen = () => {
                 }
             });
 
+            // Data objects to be used in the PieChart component are created for each category in the categoryTotals object.
+            // A color is assigned to each category and the necessary legend settings are made for the chart.
             const data = Object.keys(categoryTotals).map((category, index) => ({
                 name: category,
                 amount: categoryTotals[category],
@@ -61,7 +68,7 @@ const StatisticsScreen = () => {
 
             setChartData(data);
         } catch (error) {
-            console.log('Harcam verileri yüklenirken hata oluştu:', error);
+            console.log('An error occurred while loading expense data:', error);
         }
     };
 

@@ -1,3 +1,6 @@
+// ExpenseDetailScreen.js
+// Screen that displays the details of the selected expense and allows it to be deleted.
+
 import { Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import spacing from '../theme/spacing'

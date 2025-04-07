@@ -1,3 +1,6 @@
+// AddExpenseScreen.js
+// Form screen where the user can add a new expense.
+
 import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import spacing from '../theme/spacing';
@@ -20,7 +23,7 @@ const AddExpenseScreen = ({ navigation, route }) => {
 
     const handleSave = async () => {
         if (!title || !amount || !date || !category) {
-            Alert.alert('Hata', i18n.t('fillAllFields'));
+            Alert.alert('Alert', i18n.t('fillAllFields'));
             return;
         }
 
@@ -42,10 +45,11 @@ const AddExpenseScreen = ({ navigation, route }) => {
 
             navigation.navigate('Home', { newExpense });
         } catch (error) {
-            console.log('Gider kaydederken hata oluştu:', error);
+            console.log('An error occurred while saving the expense:', error);
         }
     };
 
+    // If data comes with route params, it will automatically fill the form.
     useEffect(() => {
         if (route.params) {
             if (route.params.selectedCategory) {

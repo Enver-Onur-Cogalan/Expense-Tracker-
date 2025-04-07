@@ -6,6 +6,8 @@ import spacing from '../theme/spacing';
 import i18n from '../locales/i18n';
 import * as Animatable from 'react-native-animatable';
 
+
+// Button component that allows going back between screens
 const GoBackButton = () => {
     const navigation = useNavigation();
 
