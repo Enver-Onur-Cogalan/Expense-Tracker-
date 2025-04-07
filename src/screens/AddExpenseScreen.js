@@ -1,69 +1,118 @@
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native'
-import React, { useState } from 'react'
+import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import React, { useState, useEffect } from 'react'
 import spacing from '../theme/spacing'
 import colors from '../theme/colors'
+import fonts from '../theme/fonts'
+import i18n from '../locales/i18n'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
-const AddExpenseScreen = ({ navigation }) => {
-    const [title, setTitle] = useState('');
-    const [amount, setAmount] = useState('');
-    const [date, setDate] = useState('');
-    const [category, setCategory] = useState('');
+const AddExpenseScreen = ({ navigation, route }) => {
+    const [title, setTitle] = useState('')
+    const [amount, setAmount] = useState('')
+    const [date, setDate] = useState('')
+    const [category, setCategory] = useState('')
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!title || !amount || !date || !category) {
-            Alert.alert('Hata', 'Lütfen tüm alanları doldurunuz');
+            Alert.alert('Hata', i18n.t('fillAllFields'));
             return;
         }
 
         const newExpense = {
-            id: Date.now().toString(),
+            id: Date.now().toString() + Math.floor(Math.random() * 1000).toString(),
             title,
             amount: parseFloat(amount),
             date,
             category,
         };
 
-        console.log('Yeni Gider:', newExpense);
+        try {
+            const storedExpenses = await AsyncStorage.getItem('expenses');
+            const expenses = storedExpenses ? JSON.parse(storedExpenses) : [];
 
-        navigation.navigate('Home', { newExpense });
+            const updatedExpenses = [...expenses, newExpense];
+
+            await AsyncStorage.setItem('expenses', JSON.stringify(updatedExpenses));
+
+            navigation.navigate('Home', { newExpense });
+        } catch (error) {
+            console.log('Gider kaydederken hata oluştu:', error);
+        }
     };
 
+    useEffect(() => {
+        if (route.params) {
+            if (route.params.selectedCategory) {
+                setCategory(route.params.selectedCategory);
+            }
+            if (route.params.title) {
+                setTitle(route.params.title);
+            }
+            if (route.params.amount) {
+                setAmount(route.params.amount);
+            }
+            if (route.params.date) {
+                setDate(route.params.date);
+            }
+        }
+    }, [route.params]);
+
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Gider Ekle</Text>
+        <SafeAreaView style={styles.container}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                <Text style={styles.backButtonText}>⏎ {i18n.t('back')}</Text>
+            </TouchableOpacity>
 
-            <TextInput
-                placeholder='Başlık'
-                value={title}
-                onChangeText={setTitle}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder='Miktar'
-                value={amount}
-                onChangeText={setAmount}
-                keyboardType='numeric'
-                style={styles.input}
-            />
-            <TextInput
-                placeholder='Tarih (YYYY-AA-GG)'
-                value={date}
-                onChangeText={setDate}
-                style={styles.input}
-            />
-            <TextInput
-                placeholder='Kategori'
-                value={category}
-                onChangeText={setCategory}
-                style={styles.input}
-            />
+            <View style={styles.headerContainer}>
+                <Text style={styles.title}>{i18n.t('addExpense')}</Text>
+            </View>
 
-            <Button title='Kaydet' onPress={handleSave} />
-        </View>
+            <View style={styles.formContainer}>
+                <TextInput
+                    placeholder={i18n.t('enterTitle')}
+                    value={title}
+                    onChangeText={setTitle}
+                    style={styles.input}
+                    placeholderTextColor={colors.textLight}
+                />
+                <TextInput
+                    placeholder={i18n.t('enterAmount')}
+                    value={amount}
+                    onChangeText={setAmount}
+                    keyboardType='numeric'
+                    style={styles.input}
+                    placeholderTextColor={colors.textLight}
+                />
+                <TextInput
+                    placeholder={i18n.t('enterDate')}
+                    value={date}
+                    onChangeText={setDate}
+                    style={styles.input}
+                    placeholderTextColor={colors.textLight}
+                />
+                <TouchableOpacity
+                    style={styles.input}
+                    onPress={() => navigation.navigate('Category', {
+                        mode: 'select',
+                        title,
+                        amount,
+                        date
+                    })}
+                >
+                    <Text style={{ color: category ? colors.text : colors.textLight }}>
+                        {category || i18n.t('selectCategory')}
+                    </Text>
+                </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+                <Text style={styles.saveButtonText}>{i18n.t('save')}</Text>
+            </TouchableOpacity>
+        </SafeAreaView>
     );
-};
+}
 
-export default AddExpenseScreen;
+export default AddExpenseScreen
 
 const styles = StyleSheet.create({
     container: {
@@ -71,17 +120,55 @@ const styles = StyleSheet.create({
         padding: spacing.medium,
         backgroundColor: colors.background,
     },
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
+    headerContainer: {
+        width: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: spacing.large,
         marginBottom: spacing.medium,
+    },
+    title: {
+        fontSize: fonts.xl,
+        fontWeight: 'bold',
+        marginBottom: spacing.large,
         color: colors.text,
     },
-    input: {
-        borderWidth: 1,
-        borderColor: colors.primary,
-        borderRadius: 6,
-        padding: spacing.small,
-        marginBottom: spacing.small,
+    formContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
     },
-});
+    input: {
+        borderRadius: 10,
+        marginBottom: spacing.medium,
+        fontSize: fonts.medium,
+        color: colors.text,
+        backgroundColor: colors.cardBackground,
+        paddingVertical: spacing.medium,
+        paddingHorizontal: spacing.large,
+        borderWidth: 1,
+        borderColor: colors.secondary,
+    },
+    saveButton: {
+        marginTop: spacing.large,
+        backgroundColor: colors.primary,
+        padding: spacing.medium,
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    saveButtonText: {
+        color: '#fff',
+        fontSize: fonts.medium,
+        fontWeight: 'bold',
+    },
+    backButton: {
+        backgroundColor: colors.primary,
+        padding: spacing.small,
+        borderRadius: 10,
+        alignSelf: 'flex-start',
+    },
+    backButtonText: {
+        color: '#fff',
+        fontSize: fonts.small,
+        fontWeight: 'bold',
+    },
+})

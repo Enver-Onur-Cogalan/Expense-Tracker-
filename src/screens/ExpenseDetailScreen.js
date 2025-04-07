@@ -1,7 +1,9 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Alert, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import spacing from '../theme/spacing'
 import colors from '../theme/colors'
+import fonts from '../theme/fonts';
+import i18n from '../locales/i18n';
 
 
 const ExpenseDetailScreen = ({ route, navigation }) => {
@@ -9,12 +11,12 @@ const ExpenseDetailScreen = ({ route, navigation }) => {
 
   const handleDelete = () => {
     Alert.alert(
-      'Gideri Sil',
-      'Bu gideri silmek istediğine emin misin?',
+      i18n.t('deleteExpense'),
+      i18n.t('confirmDelete'),
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: i18n.t('cancel'), style: 'cancel' },
         {
-          text: 'Sil',
+          text: i18n.t('delete'),
           onPress: () => {
             navigation.navigate('Home', { deleteExpenseId: expense.id });
           },
@@ -25,18 +27,30 @@ const ExpenseDetailScreen = ({ route, navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{expense.title}</Text>
-      <Text style={styles.text}>💵{expense.amount}</Text>
-      <Text style={styles.text}>Tarih: {expense.date}</Text>
-      <Text style={styles.title}>Kategori: {expense.category}</Text>
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+        <Text style={styles.backButtonText}>⏎ {i18n.t('back')}</Text>
+      </TouchableOpacity>
+
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerTitle}>{i18n.t('expenseDetail')}</Text>
+      </View>
+
+      <View style={styles.detailContainer}>
+        <Text style={styles.detailTitle}>{expense.title}</Text>
+        <Text style={styles.detailAmount}>{i18n.t('amount')}: ₺{expense.amount}</Text>
+        <Text style={styles.detailDate}>{i18n.t('date')}: {expense.date}</Text>
+        <Text style={styles.detailCategory}>{i18n.t('category')}: {expense.category}</Text>
+      </View>
 
       <View style={{ marginTop: spacing.large }}>
         <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-          <Text style={styles.deleteButtonText}>Giderleri Sil</Text>
+          <Text style={styles.deleteButtonText}>{i18n.t('deleteExpense')}</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
+
+
   );
 };
 
@@ -48,16 +62,18 @@ const styles = StyleSheet.create({
     padding: spacing.medium,
     backgroundColor: colors.background,
   },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+  headerContainer: {
+    width: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: spacing.large,
     marginBottom: spacing.medium,
-    color: colors.text,
   },
-  text: {
-    fontSize: 16,
-    marginBottom: spacing.small,
-    color: colors.text,
+  headerTitle: {
+    fontSize: fonts.xl,
+    fontWeight: '600',
+    color: colors.textLight,
+    opacity: 0.7,
   },
   deleteButton: {
     backgroundColor: colors.error,
@@ -69,6 +85,38 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: fonts.medium,
+  },
+  backButton: {
+    backgroundColor: colors.primary,
+    padding: spacing.small,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+  },
+  backButtonText: {
+    color: '#fff',
+    fontSize: fonts.small,
+    fontWeight: 'bold',
+  },
+  detailContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  detailTitle: {
+    fontSize: fonts.large,
+    fontWeight: 'bold',
+    marginBottom: spacing.medium,
+  },
+  detailAmount: {
+    fontSize: fonts.medium,
+    marginBottom: spacing.small,
+  },
+  detailDate: {
+    fontSize: fonts.medium,
+    marginBottom: spacing.small,
+  },
+  detailCategory: {
+    fontSize: fonts.medium,
   },
 });
