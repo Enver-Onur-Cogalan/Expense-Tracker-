@@ -8,6 +8,7 @@ import colors from '../theme/colors'
 import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
 import GoBackButton from '../components/GoBackButton';
+import { StackActions } from '@react-navigation/native';
 
 
 const ExpenseDetailScreen = ({ route, navigation }) => {
@@ -22,7 +23,7 @@ const ExpenseDetailScreen = ({ route, navigation }) => {
         {
           text: i18n.t('delete'),
           onPress: () => {
-            navigation.navigate('Home', { deleteExpenseId: expense.id });
+            navigation.dispatch(StackActions.popTo('Home', { deleteExpenseId: expense.id }));
           },
           style: 'destructive',
         },

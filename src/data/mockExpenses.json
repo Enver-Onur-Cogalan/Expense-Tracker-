@@ -1,0 +1,23 @@
+[
+  { "id": "1", "title": "Market Alışverişi", "amount": 250, "date": "2025-04-01", "category": "Gıda" },
+  { "id": "2", "title": "Otobüs Kartı Doldurma", "amount": 100, "date": "2025-04-02", "category": "Ulaşım" },
+  { "id": "3", "title": "Sinema Gecesi", "amount": 120, "date": "2025-04-05", "category": "Eğlence" },
+  { "id": "4", "title": "Kitap Alımı", "amount": 75, "date": "2025-04-06", "category": "Kişisel Gelişim" },
+  { "id": "5", "title": "Spor Salonu Üyeliği", "amount": 300, "date": "2025-04-07", "category": "Sağlık" },
+  { "id": "6", "title": "Kahve", "amount": 25, "date": "2025-04-08", "category": "Gıda" },
+  { "id": "7", "title": "Elektrik Faturası", "amount": 150, "date": "2025-04-10", "category": "Fatura" },
+  { "id": "8", "title": "İnternet Faturası", "amount": 120, "date": "2025-04-11", "category": "Fatura" },
+  { "id": "9", "title": "Kıyafet Alımı", "amount": 400, "date": "2025-04-12", "category": "Giyim" },
+  { "id": "10", "title": "Netflix Aboneliği", "amount": 80, "date": "2025-04-13", "category": "Eğlence" },
+  { "id": "11", "title": "Yemek Siparişi", "amount": 90, "date": "2025-04-14", "category": "Gıda" },
+  { "id": "12", "title": "Dershane Ödemesi", "amount": 2000, "date": "2025-04-15", "category": "Eğitim" },
+  { "id": "13", "title": "Benzin Alımı", "amount": 600, "date": "2025-04-16", "category": "Ulaşım" },
+  { "id": "14", "title": "Cep Telefonu Ödemesi", "amount": 300, "date": "2025-04-17", "category": "Fatura" },
+  { "id": "15", "title": "Hediye Alımı", "amount": 500, "date": "2025-04-18", "category": "Hediye" },
+  { "id": "16", "title": "Restoran", "amount": 200, "date": "2025-04-19", "category": "Gıda" },
+  { "id": "17", "title": "Çiçek Alımı", "amount": 50, "date": "2025-04-20", "category": "Hediye" },
+  { "id": "18", "title": "Laptop Tamiri", "amount": 1500, "date": "2025-04-21", "category": "Teknoloji" },
+  { "id": "19", "title": "Su Aboneliği", "amount": 100, "date": "2025-04-22", "category": "Fatura" },
+  { "id": "20", "title": "Oyun Alımı", "amount": 300, "date": "2025-04-23", "category": "Eğlence" }
+
+]

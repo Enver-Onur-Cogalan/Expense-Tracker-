@@ -1,98 +1,88 @@
 // HomeScreen.js
 // Home screen: Home page where expenses are listed and new expenses can be added.
 
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useState, useEffect } from 'react'
-import spacing from '../theme/spacing'
-import colors from '../theme/colors'
-import { useFocusEffect } from '@react-navigation/native'
-import { useCallback } from 'react'
-import fonts from '../theme/fonts'
-import i18n from '../locales/i18n'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import ExpenseItem from '../components/ExpenseItem'
+import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import spacing from '../theme/spacing';
+import colors from '../theme/colors';
+import fonts from '../theme/fonts';
+import i18n from '../locales/i18n';
+import ExpenseItem from '../components/ExpenseItem';
 import * as Animatable from 'react-native-animatable';
+import { StackActions } from '@react-navigation/native';
+import mockExpenses from '../data/mockExpenses.json';
 
 const HomeScreen = ({ navigation, route }) => {
-    const [language, setLanguage] = useState(i18n.locale)
-    const [expenses, setExpenses] = useState([]) // State used to store expense data
-    const [isFirstLoad, setIsFirstLoad] = useState(true) // check only for first load
+    const [language, setLanguage] = useState(i18n.locale);
+    const [expenses, setExpenses] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [filteredExpenses, setFilteredExpenses] = useState([]);
 
-    // Changes the language of the application according to the language selected by the user
+    // Changes the language dynamically according to the user's choice
     const changeLanguage = (lang) => {
-        i18n.locale = lang
-        setLanguage(lang)
-    }
+        i18n.locale = lang;
+        setLanguage(lang);
+    };
 
-    const loadExpenses = async () => {
-        try {
-            const storedExpenses = await AsyncStorage.getItem('expenses');
-            const parsedExpenses = storedExpenses ? JSON.parse(storedExpenses) : [];
-            setExpenses(parsedExpenses);
-        } catch (error) {
-            console.log('An error occurred while loading data:', error);
-        }
-    }
-
+    // Loads mock expenses if the expense list is empty on the first load
     useEffect(() => {
-        if (isFirstLoad) {
-            loadExpenses();
-            setIsFirstLoad(false);
+        if (expenses.length === 0) {
+            setExpenses(mockExpenses);
         }
-    }, [isFirstLoad]);
+    }, []);
 
-    useFocusEffect(
-        useCallback(() => {
-            const handleExpenses = async () => {
-                try {
-                    const storedExpenses = await AsyncStorage.getItem('expenses');
-                    const parsedExpenses = storedExpenses ? JSON.parse(storedExpenses) : [];
+    // Adds a new expense to the list when coming back from the AddExpenseScreen
+    useEffect(() => {
+        if (route.params?.newExpense) {
+            setExpenses(prev => [...prev, route.params.newExpense]);
+        }
+    }, [route.params?.newExpense]);
+    
+    // Updates categories when a new category is added in CategoryScreen
+    useEffect(() => {
+        if (route.params?.updatedCategories) {
+            setCategories(route.params.updatedCategories);
+        }
+    }, [route.params?.updatedCategories]);
 
-                    if (route.params?.newExpense) {
-                        const alreadyExists = parsedExpenses.some(
-                            (exp) => exp.id === route.params.newExpense.id
-                        );
+    // Filters expenses by selected category if category is selected
+    useEffect(() => {
+        const category = route.params?.filterCategory;
+        if (category) {
+            setFilteredExpenses(expenses.filter(exp => exp.category === category));
+        } else {
+            setFilteredExpenses(expenses);
+        }
+    }, [expenses, route.params]);
 
-                        if (!alreadyExists) {
-                            const updatedExpenses = [...parsedExpenses, route.params.newExpense];
-                            await AsyncStorage.setItem('expenses', JSON.stringify(updatedExpenses));
-                            setExpenses(updatedExpenses);
-                        }
-
-                        navigation.setParams({ newExpense: null });
-                        return;
-                    }
-
-                    if (route.params?.deleteExpenseId) {
-                        const updatedExpenses = parsedExpenses.filter(
-                            (exp) => exp.id !== route.params.deleteExpenseId
-                        );
-                        await AsyncStorage.setItem('expenses', JSON.stringify(updatedExpenses));
-                        setExpenses(updatedExpenses);
-                        navigation.setParams({ deleteExpenseId: null });
-                        return;
-                    }
-
-                } catch (error) {
-                    console.log('An error occurred while updating data:', error);
-                }
-            };
-
-            handleExpenses();
-        }, [route.params])
-    );
-
-    // If a category filter is selected, it will only show expenses belonging to that category.
-    // Otherwise, all expenses are listed.
-    const filteredCategory = route.params?.filterCategory;
-    const filteredExpenses = filteredCategory
-        ? expenses.filter(exp => exp.category === filteredCategory)
-        : expenses;
-
-// Function used to go to the detail page when the expense is selected
+    // Navigates to ExpenseDetailScreen with the selected expense details
     const handleExpenseSelect = (expense) => {
         navigation.navigate('ExpenseDetail', { expense });
-    }
+    };
+
+    // Clears all expenses when the user confirms the delete all action
+    const handleClearExpenses = () => {
+        Alert.alert(
+            i18n.t('clearExpenses'),
+            i18n.t('confirmClearExpenses'),
+            [
+                {text: i18n.t('cancel'), style: 'cancel'},
+                {
+                    text: i18n.t('delete'),
+                    style: 'destructive',
+                    onPress: () => setExpenses([]),
+                },
+            ]
+        );
+    };
+
+    // Deletes a specific expense by ID when returning from ExpenseDetailScreen
+    useEffect(() => {
+        if (route.params?.deleteExpenseId) {
+            setExpenses(prev => prev.filter(exp => exp.id !== route.params.deleteExpenseId));
+        }
+    }, [route.params?.deleteExpenseId]);
+
 
     return (
         <View style={styles.container}>
@@ -102,41 +92,56 @@ const HomeScreen = ({ navigation, route }) => {
 
             <View style={styles.listContainer}>
                 <TouchableOpacity
-                    onPress={() => navigation.navigate('Statistics')}
+                    onPress={() => navigation.dispatch(
+                        StackActions.push('Statistics', { expenses })
+                    )}
                     style={styles.chartButton}
                 >
                     <Text style={styles.chartButtonText}>{i18n.t('statistics')}</Text>
                 </TouchableOpacity>
 
                 <Animatable.View animation='fadeIn' duration={2000} delay={100}>
-                {filteredExpenses.length === 0 ? (
-                    <Text style={{ textAlign: 'center', marginTop: 20, color: colors.text }}>
-                        {i18n.t('noExpenses')}
-                    </Text>
-                ) : (
-                    <FlatList
-                        data={filteredExpenses}
-                        keyExtractor={(item) => item.id}
-                        renderItem={({ item }) => (   // Render list item for each expense
-                            <ExpenseItem
-                                title={item.title}
-                                amount={item.amount}
-                                date={item.date}
-                                category={item.category}
-                                onPress={() => handleExpenseSelect(item)}
-                            />
-                        )}
-                    />
-                )}
+                    {filteredExpenses.length === 0 ? (
+                        <Text style={{ textAlign: 'center', marginTop: 20, color: colors.text }}>
+                            {i18n.t('noExpenses')}
+                        </Text>
+                    ) : (
+                        <FlatList
+                            data={filteredExpenses}
+                            keyExtractor={(item) => item.id}
+                            renderItem={({ item }) => (
+                                <ExpenseItem
+                                    title={item.title}
+                                    amount={item.amount}
+                                    date={item.date}
+                                    category={item.category}
+                                    onPress={() => handleExpenseSelect(item)}
+                                />
+                            )}
+                            contentContainerStyle={{
+                                paddingBottom: 45,
+                            }}
+                        />
+                    )}
                 </Animatable.View>
             </View>
 
+            <View style ={{ flexDirection: 'row', justifyContent: 'space-between', marginVertical: spacing.medium}}>
             <TouchableOpacity
-            onPress={() => navigation.navigate('AddExpense')}
-            style={styles.addExpenseButton}
+                onPress={() => navigation.navigate('AddExpense')}
+                style={[styles.addExpenseButton, {flex: 1, marginRight: 5}]}
             >
                 <Text style={styles.addExpenseButtonText}>{i18n.t('addExpense')}</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+            onPress={handleClearExpenses}
+            style={[styles.clearExpensesButton, { flex: 1, marginLeft: 5 }]}
+            >
+                <Text style={styles.clearExpensesButtonText}>{i18n.t('clearExpenses')}</Text>
+            </TouchableOpacity>
+            </View>
+
 
             <View style={styles.languageContainer}>
                 <TouchableOpacity style={styles.languageButton} onPress={() => changeLanguage('tr')}>
@@ -148,12 +153,13 @@ const HomeScreen = ({ navigation, route }) => {
                 </TouchableOpacity>
             </View>
         </View>
-    )
-}
+    );
+};
 
-export default HomeScreen
+export default HomeScreen;
 
 const styles = StyleSheet.create({
+    // styles buraya aynı kalabilir
     container: {
         flex: 1,
         padding: spacing.medium,
@@ -173,6 +179,32 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: colors.textLight,
         opacity: 0.7,
+    },
+    listContainer: {
+        flex: 1,
+    },
+    chartButton: {
+        backgroundColor: colors.primary,
+        padding: 10,
+        margin: 10,
+        borderRadius: spacing.small,
+        alignItems: 'center',
+    },
+    chartButtonText: {
+        color: 'white',
+        fontWeight: 'bold',
+    },
+    addExpenseButton: {
+        backgroundColor: colors.primary,
+        padding: spacing.medium,
+        borderRadius: spacing.small,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    addExpenseButtonText: {
+        color: colors.background,
+        fontSize: fonts.large,
+        fontWeight: 'bold',
     },
     languageContainer: {
         flexDirection: 'row',
@@ -195,68 +227,16 @@ const styles = StyleSheet.create({
         fontSize: fonts.small,
         fontWeight: 'bold',
     },
-    title: {
-        fontSize: fonts.xl,
-        fontWeight: 'bold',
-        marginBottom: spacing.large,
-        color: colors.text,
-    },
-    expenseItem: {
-        backgroundColor: colors.background,
-        padding: spacing.medium,
-        marginBottom: spacing.small,
-        borderRadius: 10,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.1,
-        shadowRadius: 2,
-    },
-    expenseTitle: {
-        color: colors.text,
-        fontSize: fonts.large,
-        fontWeight: '600',
-        marginBottom: 4,
-    },
-    expenseAmount: {
-        color: colors.primary,
-        fontSize: fonts.medium,
-        marginBottom: 2,
-    },
-    expenseDate: {
-        color: colors.text,
-        fontSize: fonts.small,
-    },
-    expenseCategory: {
-        fontStyle: 'italic',
-        color: colors.text,
-        fontSize: fonts.small,
-    },
-    listContainer: {
-        flex: 1,
-    },
-    chartButton: {
+    clearExpensesButton: {
         backgroundColor: colors.primary,
-        padding: 10,
-        margin: 10,
-        borderRadius: spacing.small,
-        alignItems: 'center',
-    },
-    chartButtonText: {
-        color: 'white',
-        fontWeight: 'bold',
-    },
-    addExpenseButton: {
-        backgroundColor: colors.primary,
-        padding: spacing.medium,
         borderRadius: spacing.small,
         alignItems: 'center',
         justifyContent: 'center',
-        marginVertical: spacing.medium,
     },
-    addExpenseButtonText: {
+    clearExpensesButtonText: {
         color: colors.background,
         fontSize: fonts.large,
         fontWeight: 'bold',
+        textAlign: 'center',
     },
 });

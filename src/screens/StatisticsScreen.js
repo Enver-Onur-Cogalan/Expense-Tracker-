@@ -4,7 +4,6 @@
 import { Dimensions, SafeAreaView, ScrollView, TouchableOpacity, View, Text } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { PieChart } from 'react-native-chart-kit';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '../locales/i18n';
 import spacing from '../theme/spacing';
 import randomColors from '../theme/randomColor';
@@ -17,7 +16,8 @@ import * as Animatable from 'react-native-animatable'
 
 
 
-const StatisticsScreen = () => {
+const StatisticsScreen = ( { route, navigation }) => {
+    const { expenses } = route.params;
     const [chartData, setChartData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false)
@@ -29,49 +29,38 @@ const StatisticsScreen = () => {
     }, [selectedDate]);
 
 
-    // Loads expense data from AsyncStorage and filters it by selected month
-    const loadExpenses = async () => {
-        try {
-            const storedExpenses = await AsyncStorage.getItem('expenses');
-            const expenses = storedExpenses ? JSON.parse(storedExpenses) : [];
+    const loadExpenses = () => {
+        const selectedMonth = selectedDate.getMonth();
+        const selectedYear = selectedDate.getFullYear();
 
-            const now = new Date();
-            const selectedMonth = selectedDate.getMonth();
-            const selectedYear = selectedDate.getFullYear();
+        const monthlyExpenses = expenses.filter(expense => {
+            const expenseDate = new Date(expense.date);
+            return (
+                expenseDate.getMonth() === selectedMonth &&
+                expenseDate.getFullYear() === selectedYear
+            );
+        });
 
-            const monthlyExpenses = expenses.filter(expense => {
-                const expenseDate = new Date(expense.date);
-                return (
-                    expenseDate.getMonth() === selectedMonth &&
-                    expenseDate.getFullYear() === selectedYear
-                );
-            });
+        const categoryTotals = {};
+        monthlyExpenses.forEach(expense => {
+            if (categoryTotals[expense.category]) {
+                categoryTotals[expense.category] += parseFloat(expense.amount);
+            } else {
+                categoryTotals[expense.category] = parseFloat(expense.amount);
+            }
+        });
 
-            const categoryTotals = {};
-            monthlyExpenses.forEach(expense => {
-                if (categoryTotals[expense.category]) {
-                    categoryTotals[expense.category] += parseFloat(expense.amount);
-                } else {
-                    categoryTotals[expense.category] = parseFloat(expense.amount);
-                }
-            });
+        const data = Object.keys(categoryTotals).map((category, index) => ({
+            name: category,
+            amount: categoryTotals[category],
+            color: randomColors(index),
+            legendFontColor: '#7F7F7F',
+            legendFontSize: spacing.medium,
+        }));
 
-            // Data objects to be used in the PieChart component are created for each category in the categoryTotals object.
-            // A color is assigned to each category and the necessary legend settings are made for the chart.
-            const data = Object.keys(categoryTotals).map((category, index) => ({
-                name: category,
-                amount: categoryTotals[category],
-                color: randomColors(index),
-                legendFontColor: '#7F7F7F',
-                legendFontSize: spacing.medium,
-            }));
-
-            setChartData(data);
-        } catch (error) {
-            console.log('An error occurred while loading expense data:', error);
-        }
-    };
-
+        setChartData(data);    
+    }
+        
     const getTotalExpense  = () => {
         return chartData.reduce((total, item) => total + item.amount, 0).toFixed(2);
     };
@@ -87,7 +76,7 @@ const StatisticsScreen = () => {
                         {formatMonthYear(selectedDate)}
                     </Text>
 
-                    <Animatable.View animation='zoomIn' duration={1000}>
+                    <Animatable.View animation='fadeInUpBig' duration={1200}>
                     {chartData.length > 0 ? (
                         <PieChart
                             data={chartData}
@@ -102,7 +91,7 @@ const StatisticsScreen = () => {
                             }}
                             accessor='amount'
                             backgroundColor='transparent'
-                            paddingLeft='15'
+                            paddingLeft= {15}
                             absolute
                         />
                     ) : (

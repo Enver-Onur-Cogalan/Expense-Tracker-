@@ -7,11 +7,11 @@ import spacing from '../theme/spacing';
 import colors from '../theme/colors';
 import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform } from 'react-native';
 import GoBackButton from '../components/GoBackButton';
 import * as Animatable from 'react-native-animatable';
+import { StackActions } from '@react-navigation/native';
 
 const AddExpenseScreen = ({ navigation, route }) => {
     const [title, setTitle] = useState('')
@@ -35,18 +35,7 @@ const AddExpenseScreen = ({ navigation, route }) => {
             category,
         };
 
-        try {
-            const storedExpenses = await AsyncStorage.getItem('expenses');
-            const expenses = storedExpenses ? JSON.parse(storedExpenses) : [];
-
-            const updatedExpenses = [...expenses, newExpense];
-
-            await AsyncStorage.setItem('expenses', JSON.stringify(updatedExpenses));
-
-            navigation.navigate('Home', { newExpense });
-        } catch (error) {
-            console.log('An error occurred while saving the expense:', error);
-        }
+            navigation.dispatch(StackActions.popTo('Home', { newExpense }));
     };
 
     // If data comes with route params, it will automatically fill the form.
@@ -83,17 +72,17 @@ const AddExpenseScreen = ({ navigation, route }) => {
                 <TextInput
                     placeholder={i18n.t('enterTitle')}
                     value={title}
-                    onChangeText={setTitle}
                     style={styles.input}
+                    onChangeText={(text) => setTitle(text)}
                     placeholderTextColor={colors.textLight}
                 />
                 <TextInput
                     placeholder={i18n.t('enterAmount')}
                     value={amount}
-                    onChangeText={setAmount}
                     keyboardType='numeric'
                     style={styles.input}
                     placeholderTextColor={colors.textLight}
+                    onChangeText={(text) => setAmount(text)}
                 />
                 <TouchableOpacity
                     style={styles.input}

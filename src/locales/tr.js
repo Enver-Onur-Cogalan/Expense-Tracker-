@@ -36,4 +36,6 @@ export default {
         'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
     ],
     totalExpense: "Toplam Harcama",
+    clearExpenses: "Tüm Giderleri Sil",
+    confirmClearExpenses: "Tüm giderleri silmek istediğinizden emin misiniz?",
 };

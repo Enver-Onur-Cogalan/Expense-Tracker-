@@ -7,10 +7,9 @@ import colors from '../theme/colors';
 import { FlatList, Text, TextInput, TouchableOpacity, View, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useFocusEffect } from '@react-navigation/native';
 import CategoryItem from '../components/CategoryItem';
 import * as Animatable from 'react-native-animatable';
+import { StackActions } from '@react-navigation/native';
 
 const CategoryScreen = ({ navigation, route }) => {
     const [categories, setCategories] = useState([]);  // Keeps the category list
@@ -25,105 +24,19 @@ const CategoryScreen = ({ navigation, route }) => {
         en: ['Food', 'Transport', 'Entertainment', 'Personal Care', 'Health'],
     };
 
-    useEffect(() => {
-        const loadCategories = async () => {
-            try {
-                const storedCategories = await AsyncStorage.getItem('categories');
-                if (storedCategories) {
-                    setCategories(JSON.parse(storedCategories));
-                } else {
-                    const defaults = defaultCategories[i18n.locale] || [];
-                    await AsyncStorage.setItem('categories', JSON.stringify(defaults));
-                    setCategories(defaults);
-                }
-            } catch (error) {
-                console.log('An error occurred while loading categories:', error);
-            }
-        };
-
-        loadCategories();
-    }, []);
-
-
-    // Refreshes the categories every time the screen is focused.
-    useFocusEffect(
-        useCallback(() => {
-            const fetchCategories = async () => {
-                try {
-                    const storedCategories = await AsyncStorage.getItem('categories');
-                    if (storedCategories) {
-                        setCategories(JSON.parse(storedCategories));
-                    }
-                } catch (error) {
-                    console.log("Error loading category in Focus:", error);
-                }
-            };
-
-            fetchCategories();
-        }, [])
-    );
-
-    // Updates default categories when language changes.
-    useEffect(() => {
-        const updatedCategoriesForLanguageChange = async () => {
-            try {
-                const storedCategories = await AsyncStorage.getItem('categories');
-                const currentCategories = storedCategories ? JSON.parse(storedCategories) : [];
-
-                const allDefaults = [...defaultCategories['tr'], ...defaultCategories['en']];
-
-                const userAddedCategories = currentCategories.filter(cat => !allDefaults.includes(cat));
-
-                const newDefaults = defaultCategories[i18n.locale] || [];
-
-                const updatedCategories = [...newDefaults, ...userAddedCategories];
-
-                await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
-                setCategories(updatedCategories);
-            } catch (error) {
-                console.log('An error occurred while updating categories on language change:', error)
-            }
-        };
-        updatedCategoriesForLanguageChange();
-    }, [i18n.locale]);
-
-
-    // When the category list changes, it saves the new list to AsyncStorage.
-    useEffect(() => {
-        const saveCategories = async () => {
-            try {
-                await AsyncStorage.setItem('categories', JSON.stringify(categories));
-            } catch (error) {
-                console.log('An error occurred while saving categories:', error);
-            }
-        };
-
-        if (categories.length > 0) {
-            saveCategories();
-        }
-    }, [categories]);
-
-
-    // Adds new category and saves it to AsyncStorage.
     const addCategory = async () => {
         if (newCategory.trim() === '') return;
 
-        try {
-            const storedCategories = await AsyncStorage.getItem('categories');
-            const currentCategories = storedCategories ? JSON.parse(storedCategories) : [];
+        if (!categories.includes(newCategory.trim())) {
+            const updated = [...categories, newCategory.trim()];
+            setCategories(updated);
+            setNewCategory('');
 
-            if (!currentCategories.includes(newCategory.trim())) {
-                const updatedCategories = [...currentCategories, newCategory.trim()];
-                await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
-                setCategories(updatedCategories);
-                setNewCategory('');
-            }
-        } catch (error) {
-            console.log('An error occurred while adding a category:', error);
+           navigation.dispatch(StackActions.popTo('Home', { updatedCategories: updatedCategoriesList }));
+
         }
     };
 
-    // Deletes the selected category and updates the AsyncStorage.
     const deleteCategory = (categoryToDelete) => {
         Alert.alert(
             i18n.t('deleteCategory'),
@@ -133,22 +46,27 @@ const CategoryScreen = ({ navigation, route }) => {
                 {
                     text: i18n.t('delete'),
                     style: 'destructive',
-                    onPress: async () => {
-                        try {
-                            const storedCategories = await AsyncStorage.getItem('categories');
-                            const currentCategories = storedCategories ? JSON.parse(storedCategories) : [];
+                    onPress: () => {
+                        const updated = categories.filter(cat => cat !== categoryToDelete);
+                        setCategories(updated);
 
-                            const updatedCategories = currentCategories.filter(cat => cat !== categoryToDelete);
-                            await AsyncStorage.setItem('categories', JSON.stringify(updatedCategories));
-                            setCategories(updatedCategories);
-                        } catch (error) {
-                            console.log('An error occurred while deleting a category:', error);
-                        }
+                        navigation.dispatch(StackActions.popTo('Home', { updatedCategories: updated }));
                     }
                 }
             ]
         );
     };
+
+    useEffect(() => {
+        if(categories.length === 0) {
+            const defaults = defaultCategories[i18n.locale] || [];
+            setCategories(defaults);
+        }
+    }, []);
+
+    const handleSaveCategoryAndReturn = () => {
+        navigation.navigate('Home', { updatedCategories: categories });
+    }
 
 
     // When a category is selected, it directs to the relevant screen.

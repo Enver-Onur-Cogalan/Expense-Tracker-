@@ -36,4 +36,6 @@ export default {
         'July', 'August', 'September', 'October', 'November', 'December'
     ],
     totalExpense: "Total Expense",
+    clearExpenses: "Clear All Expenses",
+    confirmClearExpenses: "Are you sure you want to delete all expenses?",
 };

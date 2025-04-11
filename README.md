@@ -1,6 +1,7 @@
 # Expense Tracker App
 
 **Expense Tracker** is a mobile application where users can record, view, and analyze their expenses based on categories.
+The project was developed with a prop drilling architecture (without global state management).
 
 ---
 
@@ -8,11 +9,12 @@
 
 - Add, view, and delete expenses
 - Select and add new categories
+- Automatic mock expenses loading on app start
 - Monthly expense chart on the Statistics screen (PieChart)
 - Display of total monthly spending
 - Language selection (Turkish / English)
 - Responsive and modern user interface
-- Clean and modular code structure
+- Clean, modular, and well-commented code structure
 
 ---
 
@@ -20,7 +22,6 @@
 
 - React Native (CLI)
 - React Navigation (Stack Navigation)
-- AsyncStorage (local storage)
 - react-native-chart-kit (for charts)
 - react-native-animatable (for animations)
 - i18n-js (multi-language support)
@@ -70,7 +71,8 @@
 - Code Structure: Modular and readable code.
 - UI/UX: Responsive and user-friendly design.
 - Error Handling: Input validation and error feedback are implemented.
-- Performance: Smooth and fast transitions.
+- Performance: Smooth and optimized navigation and screen transitions.
+- Architecture: Pure Prop Drilling without global state management.
 
 ---
 
@@ -86,10 +88,20 @@
 
 - This project was developed for personal improvement and mobile development practice.
 - Written according to Clean Code principles.
+- No global state management libraries (like Redux, Zustand, etc.) were used.
+Instead, all data flow is managed via prop drilling and local component states.
 
 ---
 
 # 🔥 Additional Information
 
-- ✨ react-native-animatable is used to enhance user experience with animations.
-- ✨ Monthly expense data is displayed interactively with PieChart in the Statistics screen.
+- ✨ Animations are added using react-native-animatable to enhance user experience.
+- ✨ Monthly expenses are dynamically displayed with PieChart on the Statistics screen.
+- ✨ Multi-language support (Turkish and English) is provided using i18n-js.
+
+---
+
+# 🚀 SPECIAL POINTS
+
+- ✅ Mockdata loads on first app open if there are no expenses.
+- ✅ FlatList rendering is tested with large datasets for performance.
