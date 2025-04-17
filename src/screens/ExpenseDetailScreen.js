@@ -8,11 +8,14 @@ import colors from '../theme/colors'
 import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
 import GoBackButton from '../components/GoBackButton';
-import { StackActions } from '@react-navigation/native';
+import { useExpenseContext } from '../contexts/ExpenseContext';
+import LottieView from 'lottie-react-native';
+import moneyAnim from '../assets/animations/money.json'
 
 
 const ExpenseDetailScreen = ({ route, navigation }) => {
   const { expense } = route.params;
+  const { expenses, updateState } = useExpenseContext();
 
   const handleDelete = () => {
     Alert.alert(
@@ -23,7 +26,9 @@ const ExpenseDetailScreen = ({ route, navigation }) => {
         {
           text: i18n.t('delete'),
           onPress: () => {
-            navigation.dispatch(StackActions.popTo('Home', { deleteExpenseId: expense.id }));
+            const updated = expenses.filter(item => item.id !== expense.id);
+            updateState({ expenses: updated });
+            navigation.goBack();
           },
           style: 'destructive',
         },
@@ -39,6 +44,12 @@ const ExpenseDetailScreen = ({ route, navigation }) => {
         <Text style={styles.headerTitle}>{i18n.t('expenseDetail')}</Text>
       </View>
 
+      <LottieView
+      source={moneyAnim}
+      autoPlay
+      loop
+      style={{ width: 200, height: 200, alignSelf: 'center', bottom: -40 }}
+      />
       <View style={styles.detailContainer}>
         <Text style={styles.detailTitle}>{expense.title}</Text>
         <Text style={styles.detailAmount}>{i18n.t('amount')}: ₺{expense.amount}</Text>

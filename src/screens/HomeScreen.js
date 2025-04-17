@@ -2,7 +2,7 @@
 // Home screen: Home page where expenses are listed and new expenses can be added.
 
 import { Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import spacing from '../theme/spacing';
 import colors from '../theme/colors';
 import fonts from '../theme/fonts';
@@ -11,12 +11,12 @@ import ExpenseItem from '../components/ExpenseItem';
 import * as Animatable from 'react-native-animatable';
 import { StackActions } from '@react-navigation/native';
 import mockExpenses from '../data/mockExpenses.json';
+import { useExpenseContext } from '../contexts/ExpenseContext';
 
 const HomeScreen = ({ navigation, route }) => {
     const [language, setLanguage] = useState(i18n.locale);
-    const [expenses, setExpenses] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [filteredExpenses, setFilteredExpenses] = useState([]);
+
+    const { expenses, updateState, categories } = useExpenseContext();
 
     // Changes the language dynamically according to the user's choice
     const changeLanguage = (lang) => {
@@ -27,33 +27,15 @@ const HomeScreen = ({ navigation, route }) => {
     // Loads mock expenses if the expense list is empty on the first load
     useEffect(() => {
         if (expenses.length === 0) {
-            setExpenses(mockExpenses);
+            updateState({ expenses: mockExpenses });
         }
     }, []);
 
-    // Adds a new expense to the list when coming back from the AddExpenseScreen
-    useEffect(() => {
-        if (route.params?.newExpense) {
-            setExpenses(prev => [...prev, route.params.newExpense]);
-        }
-    }, [route.params?.newExpense]);
     
-    // Updates categories when a new category is added in CategoryScreen
-    useEffect(() => {
-        if (route.params?.updatedCategories) {
-            setCategories(route.params.updatedCategories);
-        }
-    }, [route.params?.updatedCategories]);
-
-    // Filters expenses by selected category if category is selected
-    useEffect(() => {
-        const category = route.params?.filterCategory;
-        if (category) {
-            setFilteredExpenses(expenses.filter(exp => exp.category === category));
-        } else {
-            setFilteredExpenses(expenses);
-        }
-    }, [expenses, route.params]);
+    const filterCategory = route.params?.filterCategory;
+    const filteredExpenses = filterCategory
+    ? expenses.filter((exp) => exp.category === filterCategory)
+    : expenses;
 
     // Navigates to ExpenseDetailScreen with the selected expense details
     const handleExpenseSelect = (expense) => {
@@ -70,19 +52,11 @@ const HomeScreen = ({ navigation, route }) => {
                 {
                     text: i18n.t('delete'),
                     style: 'destructive',
-                    onPress: () => setExpenses([]),
+                    onPress: () => updateState({ expenses: [] }),
                 },
             ]
         );
     };
-
-    // Deletes a specific expense by ID when returning from ExpenseDetailScreen
-    useEffect(() => {
-        if (route.params?.deleteExpenseId) {
-            setExpenses(prev => prev.filter(exp => exp.id !== route.params.deleteExpenseId));
-        }
-    }, [route.params?.deleteExpenseId]);
-
 
     return (
         <View style={styles.container}>

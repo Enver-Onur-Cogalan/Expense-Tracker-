@@ -2,44 +2,55 @@ import { Text, TouchableOpacity, View, StyleSheet } from 'react-native';
 import colors from '../theme/colors';
 import spacing from '../theme/spacing';
 import fonts from '../theme/fonts';
+import * as Animatable from 'react-native-animatable';
+import Icon from 'react-native-vector-icons/Ionicons'
+import categoryIconMap from '../utils/iconMap';
+
+const deleteIcon = <Icon name='trash-outline' size={18} color='#555' />
 
 // Component that displays the category name and performs selection or deletion when clicked
-const CategoryItem = ({ item, onSelect, onDelete }) => {
+const CategoryItem = ({ item, onSelect, onDelete, align }) => {
+    const iconName = categoryIconMap[item] || 'help-circle-outline';
     return (
-        <View style={[styles.container, { backgroundColor: colors[item] || colors.primary }]}>
-            <TouchableOpacity onPress={() => onSelect(item)} style={styles.item}>
-                <Text style={styles.text}>{item}</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => onDelete(item)} style={styles.deleteButton}>
-                <Text style={styles.deleteButtonText}>🗑️</Text>
-            </TouchableOpacity>
-        </View>
-    );
+    <Animatable.View animation="fadeInUp" duration={500} style={[styles.chipContainer, {alignSelf: align}]}>
+      <TouchableOpacity style={styles.chip} onPress={() => onSelect(item)}>
+        <Icon name={iconName} size={16} color='#555' style={{ marginRight: 6}} />
+        <Text style={styles.chipText} numberOfLines={1}>{item}</Text>
+        <TouchableOpacity onPress={() => onDelete(item)} style={styles.icon}>
+            {deleteIcon}
+        </TouchableOpacity>
+      </TouchableOpacity>
+    </Animatable.View>
+  );
 };
 
 export default CategoryItem;
 
 const styles = StyleSheet.create({
-    container: {
+    chipContainer: {
+        margin: spacing.small / 1.5,
+        width: '48%'
+    },
+    chip: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderRadius: 8,
-        padding: spacing.medium,
-        marginBottom: spacing.small,
+        backgroundColor: colors.primary,
+        padding: 16,
+        borderRadius: 20,
+        width: '100%',
+        marginVertical: 8,
+        elevation: 1,
     },
-    item: {
-        padding: spacing.medium,
+    chipText: {
+        flex: 1,
+        color: colors.text,
+        fontSize: fonts.small,
+        flexShrink: 1,
     },
-    text: {
-        color: '#fff',
-        fontSize: fonts.large,
-    },
-    deleteButton: {
-        marginLeft: spacing.small,
-    },
-    deleteButtonText: {
-        fontSize: fonts.large,
+    icon: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });
+    

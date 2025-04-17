@@ -13,11 +13,14 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import formatMonthYear from '../utils/formatDate';
 import GoBackButton from '../components/GoBackButton';
 import * as Animatable from 'react-native-animatable'
+import { useExpenseContext } from '../contexts/ExpenseContext';
+import LottieView from 'lottie-react-native';
+import statAnim from '../assets/animations/statistic.json'
 
 
 
 const StatisticsScreen = ( { route, navigation }) => {
-    const { expenses } = route.params;
+    const { expenses } = useExpenseContext();
     const [chartData, setChartData] = useState([]);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false)
@@ -66,8 +69,10 @@ const StatisticsScreen = ( { route, navigation }) => {
     };
 
     return (
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1}}>
+            <View style={{marginTop: 20}}>
             <GoBackButton />
+            </View>
 
             <ScrollView>
                 <View style={{ flex: 1, alignItems: 'center', marginTop: 30 }}>
@@ -99,34 +104,33 @@ const StatisticsScreen = ( { route, navigation }) => {
                     )}
                     </Animatable.View>
                 </View>
-            </ScrollView>
             <TouchableOpacity
                 onPress={() => setShowDatePicker(true)}
                 style={{
-                    backgroundColor: colors.background,
+                    backgroundColor: 'black',
                     padding: 10,
                     margin: 10,
                     borderRadius: spacing.small,
-                    alignItems: 'center'
+                    alignItems: 'center',
+                    alignSelf: 'center',
                 }}
-            >
+                >
                 <Text style={{ color: colors.secondary, fontWeight: 'bold' }}>{i18n.t('enterDate')}</Text>
             </TouchableOpacity>
 
             {showDatePicker && (
                 <DateTimePicker
-                    value={selectedDate}
-                    mode='date'
-                    display='spinner'
-                    onChange={(event, date) => {
-                        setShowDatePicker(false);
-                        if (date) {
-                            setSelectedDate(date);
-                        }
-                    }}
+                value={selectedDate}
+                mode='date'
+                display='default'
+                onChange={(event, date) => {
+                    setShowDatePicker(false);
+                    if (date) {
+                        setSelectedDate(date);
+                    }
+                }}
                 />
             )}
-
             <Text style={{ 
                 fontSize: fonts.large,
                 color: colors.text,
@@ -136,6 +140,15 @@ const StatisticsScreen = ( { route, navigation }) => {
                 }}>
                 {i18n.t('totalExpense')}: {getTotalExpense()} ₺
             </Text>
+            </ScrollView>
+
+
+            <LottieView
+            source={statAnim}
+            autoPlay
+            loop
+            style={{ width: 250, height: 250, position: 'absolute', bottom: 60, alignSelf: 'center' }}
+            />
         </SafeAreaView>
     )
 }

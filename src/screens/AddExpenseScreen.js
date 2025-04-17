@@ -11,7 +11,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { Platform } from 'react-native';
 import GoBackButton from '../components/GoBackButton';
 import * as Animatable from 'react-native-animatable';
-import { StackActions } from '@react-navigation/native';
+import { useExpenseContext } from '../contexts/ExpenseContext';
 
 const AddExpenseScreen = ({ navigation, route }) => {
     const [title, setTitle] = useState('')
@@ -20,6 +20,8 @@ const AddExpenseScreen = ({ navigation, route }) => {
     const [category, setCategory] = useState('')
 
     const [showDatePicker, setShowDatePicker] = useState(false);
+
+    const { expenses, updateState } = useExpenseContext();
 
     const handleSave = async () => {
         if (!title || !amount || !date || !category) {
@@ -35,7 +37,9 @@ const AddExpenseScreen = ({ navigation, route }) => {
             category,
         };
 
-            navigation.dispatch(StackActions.popTo('Home', { newExpense }));
+            updateState({ expenses: [...expenses, newExpense] });
+
+            navigation.navigate('Home');
     };
 
     // If data comes with route params, it will automatically fill the form.

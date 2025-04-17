@@ -1,7 +1,7 @@
 // CategoryScreen.js
 // Screen where the user can list and manage expense categories.
 
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import spacing from '../theme/spacing';
 import colors from '../theme/colors';
 import { FlatList, Text, TextInput, TouchableOpacity, View, StyleSheet, SafeAreaView, Alert } from 'react-native';
@@ -9,31 +9,27 @@ import fonts from '../theme/fonts';
 import i18n from '../locales/i18n';
 import CategoryItem from '../components/CategoryItem';
 import * as Animatable from 'react-native-animatable';
-import { StackActions } from '@react-navigation/native';
+import { useExpenseContext } from '../contexts/ExpenseContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import Icon from 'react-native-vector-icons/Ionicons'
 
 const CategoryScreen = ({ navigation, route }) => {
-    const [categories, setCategories] = useState([]);  // Keeps the category list
+    const { categories, updateState } = useExpenseContext();
     const [newCategory, setNewCategory] = useState('');  // Holds the name of the newly added category
+
+    const { locale } = useLanguage();
 
     const mode = route.params?.mode || 'filter';  // Keeps track of which mode the user is in (selection or filtering)
 
     const [prevLocale, setPrevLocale] = useState(i18n.locale);  // Keeps the previous language, used to control language change
-
-    const defaultCategories = {
-        tr: ['Gıda', 'Ulaşım', 'Eğlence', 'Kişisel Bakım', 'Sağlık'],
-        en: ['Food', 'Transport', 'Entertainment', 'Personal Care', 'Health'],
-    };
 
     const addCategory = async () => {
         if (newCategory.trim() === '') return;
 
         if (!categories.includes(newCategory.trim())) {
             const updated = [...categories, newCategory.trim()];
-            setCategories(updated);
+            updateState({ categories: updated });
             setNewCategory('');
-
-           navigation.dispatch(StackActions.popTo('Home', { updatedCategories: updatedCategoriesList }));
-
         }
     };
 
@@ -48,26 +44,17 @@ const CategoryScreen = ({ navigation, route }) => {
                     style: 'destructive',
                     onPress: () => {
                         const updated = categories.filter(cat => cat !== categoryToDelete);
-                        setCategories(updated);
-
-                        navigation.dispatch(StackActions.popTo('Home', { updatedCategories: updated }));
+                        updateState({ categories: updated });
                     }
                 }
             ]
         );
     };
-
+    
     useEffect(() => {
-        if(categories.length === 0) {
-            const defaults = defaultCategories[i18n.locale] || [];
-            setCategories(defaults);
-        }
-    }, []);
-
-    const handleSaveCategoryAndReturn = () => {
-        navigation.navigate('Home', { updatedCategories: categories });
-    }
-
+        const defaults = i18n.t('categories.default', { defaultValue: [] });
+        updateState({ categories: defaults });
+    }, [locale]);
 
     // When a category is selected, it directs to the relevant screen.
     const handleCategorySelect = (category) => {
@@ -87,15 +74,12 @@ const CategoryScreen = ({ navigation, route }) => {
 
     return (
         <SafeAreaView style={styles.container}>
+            <View style={styles.content}>
+
             <View style={styles.headerContainer}>
                 <Text style={styles.headerTitle}>{i18n.t('category')}</Text>
-            </View>
-
-            <View style={styles.listContainer}>
                 {categories.length === 0 && (
-                    <Text style={{ textAlign: 'center', marginTop: 20, color: colors.text }}>
-                        {i18n.t('noCategories')}
-                    </Text>
+                    <Text style={styles.emptyText}>{i18n.t('noCategories')}</Text>
                 )}
             </View>
 
@@ -104,16 +88,21 @@ const CategoryScreen = ({ navigation, route }) => {
                 data={categories}
                 keyExtractor={(item, index) => `${item}-${index}`}
                 // Render list items for each category (with selection and deletion operations)
-                renderItem={({ item }) => (  
+                renderItem={({ item, index }) => (  
                     <CategoryItem
                         item={item}
                         onSelect={handleCategorySelect}
                         onDelete={deleteCategory}
+                        align={index % 2 === 0 ? 'flex-start' : 'flex-end'}
                     />
                 )}
+                numColumns={2}
+                columnWrapperStyle={{ justifyContent: 'center', marginBottom: spacing.small }}
+                contentContainerStyle={{ paddingBottom: spacing.medium }}
             />
             </Animatable.View>
 
+            </View>
             <TextInput
                 placeholder={i18n.t('addCategory')}
                 value={newCategory}
@@ -121,17 +110,17 @@ const CategoryScreen = ({ navigation, route }) => {
                 style={styles.input}
                 placeholderTextColor={colors.text}
             />
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={addCategory} style={styles.addCategoryButton}>
+
+            <View style={styles.buttonRow}>
+                <TouchableOpacity onPress={addCategory} style={styles.saveButton}>
                     <Text style={styles.buttonText}>{i18n.t('save')}</Text>
                 </TouchableOpacity>
-            </View>
 
-            <View style={styles.buttonContainer}>
-                <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.addCategoryButton}>
+                <TouchableOpacity onPress={() => navigation.navigate('Home')} style={styles.homeButton}>
                     <Text style={styles.buttonText}>{i18n.t('backHome')}</Text>
                 </TouchableOpacity>
             </View>
+
         </SafeAreaView>
     );
 };
@@ -144,11 +133,9 @@ const styles = StyleSheet.create({
         padding: spacing.medium,
         backgroundColor: colors.background,
     },
-    title: {
-        fontSize: fonts.xl,
-        fontWeight: 'bold',
-        marginBottom: spacing.medium,
-        color: colors.text,
+    content: {
+        flex: 1,
+        padding: spacing.medium,
     },
     headerContainer: {
         width: '100%',
@@ -159,48 +146,46 @@ const styles = StyleSheet.create({
     },
     headerTitle: {
         fontSize: fonts.xl,
-        fontWeight: '600',
+        fontWeight: 'bold',
         color: colors.textLight,
         opacity: 0.7,
     },
-    listContainer: {
-        flex: 1,
-    },
-    categoryItem: {
-        padding: spacing.medium,
-        marginBottom: spacing.small,
-        borderRadius: 8,
-    },
-    categoryText: {
-        color: '#fff',
-        fontSize: fonts.large,
+    emptyText: {
+        textAlign: 'center',
+        color: colors.text,
+        marginVertical: spacing.large,
+        fontSize: fonts.medium,
     },
     input: {
         borderWidth: 1,
         borderColor: colors.primary,
         padding: spacing.small,
         marginBottom: spacing.small,
-        borderRadius: 6,
-        color: colors.text,
-    },
-    buttonContainer: {
-        marginTop: spacing.small,
-    },
-    catergoryItemContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
         borderRadius: 8,
-        padding: spacing.medium,
-        marginBottom: spacing.small,
+        color: colors.text,
+        marginHorizontal: spacing.small,
     },
-    addCategoryButton: {
-        backgroundColor: colors.primary,
-        padding: spacing.medium,
-        borderRadius: spacing.small,
-        alignItems: 'center',
+    buttonRow: {
+        flexDirection: 'row',
         justifyContent: 'center',
-        marginBottom: spacing.small,
+        marginTop:spacing.medium,
+        paddingHorizontal: spacing.medium,
+    },
+    saveButton: {
+        flex: 1,
+        backgroundColor: colors.primary,
+        padding: 10,
+        borderRadius: 8,
+        marginLeft: spacing.small,
+        alignItems: 'center',
+    },
+    homeButton: {
+        flex: 1,
+        backgroundColor: colors.primary,
+        padding: 10,
+        borderRadius: 8,
+        marginLeft: spacing.small,
+        alignItems: 'center',
     },
     buttonText: {
         color: colors.background,

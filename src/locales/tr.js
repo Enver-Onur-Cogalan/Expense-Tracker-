@@ -38,4 +38,29 @@ export default {
     totalExpense: "Toplam Harcama",
     clearExpenses: "Tüm Giderleri Sil",
     confirmClearExpenses: "Tüm giderleri silmek istediğinizden emin misiniz?",
+    categories: {
+    default: [
+        'Gıda',
+        'Ulaşım',
+        'Eğlence',
+        'Kişisel Bakım',
+        'Sağlık',
+        'Faturalar',
+        'Eğitim',
+        'Alışveriş',
+        'Yatırım',
+        'Evcil Hayvanlar'
+    ],
+    food: 'Gıda',
+    transport: 'Ulaşım',
+    entertainment: 'Eğlence',
+    personalCare: 'Kişisel Bakım',
+    health: 'Sağlık',
+    bills: 'Faturalar',
+    education: 'Eğitim',
+    shopping: 'Alışveriş',
+    investment: 'Yatırım',
+    pets: 'Evcil Hayvanlar',
+    },
+
 };
